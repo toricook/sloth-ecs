@@ -1,0 +1,46 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6DB3A7C3-48C2-4DA6-B1F2-6BADED5CA585}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sloth.Core", "src\Sloth.Core\Sloth.Core.csproj", "{21ADC478-8A63-4BDE-B2ED-4FDF5D7542CF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sloth.MonoGame", "src\Sloth.MonoGame\Sloth.MonoGame.csproj", "{856C6475-6BCD-4810-9F84-BA4F2488BB75}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{2DE29447-512E-425D-AB64-907B8C217C40}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Pong", "Pong", "{BFCC310D-D2FD-4148-A6CE-A668E81866AE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sloth.Samples.Pong", "samples\Pong\Sloth.Samples.Pong\Sloth.Samples.Pong.csproj", "{D6A9B3AD-C633-466F-9174-2585CCD2026D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{21ADC478-8A63-4BDE-B2ED-4FDF5D7542CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{21ADC478-8A63-4BDE-B2ED-4FDF5D7542CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{21ADC478-8A63-4BDE-B2ED-4FDF5D7542CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{21ADC478-8A63-4BDE-B2ED-4FDF5D7542CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{856C6475-6BCD-4810-9F84-BA4F2488BB75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{856C6475-6BCD-4810-9F84-BA4F2488BB75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{856C6475-6BCD-4810-9F84-BA4F2488BB75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{856C6475-6BCD-4810-9F84-BA4F2488BB75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6A9B3AD-C633-466F-9174-2585CCD2026D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6A9B3AD-C633-466F-9174-2585CCD2026D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6A9B3AD-C633-466F-9174-2585CCD2026D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6A9B3AD-C633-466F-9174-2585CCD2026D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{21ADC478-8A63-4BDE-B2ED-4FDF5D7542CF} = {6DB3A7C3-48C2-4DA6-B1F2-6BADED5CA585}
+		{856C6475-6BCD-4810-9F84-BA4F2488BB75} = {6DB3A7C3-48C2-4DA6-B1F2-6BADED5CA585}
+		{BFCC310D-D2FD-4148-A6CE-A668E81866AE} = {2DE29447-512E-425D-AB64-907B8C217C40}
+		{D6A9B3AD-C633-466F-9174-2585CCD2026D} = {BFCC310D-D2FD-4148-A6CE-A668E81866AE}
+	EndGlobalSection
+EndGlobal
