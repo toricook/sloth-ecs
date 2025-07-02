@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Xna.Framework;
+using Sloth.Core.Entities;
 
-namespace Sloth.Core
+namespace Sloth.Core.Components
 {
     /// <summary>
     /// Base class for all components in the ECS framework.

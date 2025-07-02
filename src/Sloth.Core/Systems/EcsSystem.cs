@@ -1,14 +1,14 @@
-using System;
+using Sloth.Core.Components;
+using Sloth.Core.Entities;
+using Sloth.Core.Enums;
 using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Xna.Framework;
 
-namespace Sloth.Core
+namespace Sloth.Core.Systems
 {
     /// <summary>
     /// Base class for all systems in the ECS framework.
     /// </summary>
-    public abstract class System
+    public abstract class EcsSystem
     {
         /// <summary>
         /// The world this system operates on.
@@ -38,7 +38,7 @@ namespace Sloth.Core
         /// Updates the system.
         /// </summary>
         /// <param name="gameTime">The current game time.</param>
-        public abstract void Update(GameTime gameTime);
+        public abstract void Update(float gameTime);
 
         /// <summary>
         /// Gets all entities that have all of the specified component types.

@@ -1,13 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.WebSockets;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Penguin.Components.Rendering;
-using Penguin.Interfaces;
-using Penguin.Managers;
-using Penguin.Systems.Rendering;
+using Sloth.Core.Components;
+using Sloth.Core.Entities;
+using Sloth.Core.Systems;
 
 namespace Sloth.Core
 {
@@ -18,27 +14,22 @@ namespace Sloth.Core
     {
         // Entities in the world
         private readonly List<Entity> _entities = new List<Entity>();
-        
-        // Systems in the world
-        private readonly List<System> _systems = new List<System>();
 
-        // Render systems in the world
-        private readonly List<RenderSystem> _renderSystems = new List<RenderSystem>();
-        
+        // Systems in the world  
+        private readonly List<EcsSystem> _systems = new List<EcsSystem>();
+
         // Component-to-entity lookup for faster queries
         private readonly Dictionary<Type, List<Entity>> _componentEntityMap = new Dictionary<Type, List<Entity>>();
-        
+
         // Shared data storage for inter-system communication
         private readonly Dictionary<string, object> _sharedData = new Dictionary<string, object>();
-
-        public IGameContentProvider ContentProvider;
 
         /// <summary>
         /// Creates a new world.
         /// </summary>
-        public World(IGameContentProvider contentProvider)
+        public World()
         {
-            ContentProvider = contentProvider;
+            // Simple constructor - no dependencies required for core ECS
         }
 
         /// <summary>
@@ -51,12 +42,12 @@ namespace Sloth.Core
             {
                 throw new InvalidOperationException("Entity already belongs to another world");
             }
-            
+
             if (!_entities.Contains(entity))
             {
                 _entities.Add(entity);
                 entity.World = this;
-                
+
                 // Update component-entity map for quick lookup
                 foreach (Component component in entity.GetAllComponents())
                 {
@@ -77,7 +68,7 @@ namespace Sloth.Core
             {
                 return false;
             }
-            
+
             if (_entities.Remove(entity))
             {
                 // Remove from component-entity map
@@ -85,11 +76,11 @@ namespace Sloth.Core
                 {
                     UnregisterComponentEntity(component.GetType(), entity);
                 }
-                
+
                 entity.World = null;
                 return true;
             }
-            
+
             return false;
         }
 
@@ -97,21 +88,14 @@ namespace Sloth.Core
         /// Adds a system to the world.
         /// </summary>
         /// <param name="system">The system to add.</param>
-        public void AddSystem(System system)
+        public void AddSystem(EcsSystem system)
         {
             if (!_systems.Contains(system))
             {
                 _systems.Add(system);
-                
+
                 // Sort systems by priority
                 _systems.Sort((a, b) => a.Priority.CompareTo(b.Priority));
-            }
-
-            if (system is RenderSystem renderSystem && !_renderSystems.Contains(renderSystem))
-            {
-                _renderSystems.Add(renderSystem);
-                // Sort systems by priority
-                _renderSystems.Sort((a, b) => a.Priority.CompareTo(b.Priority));
             }
         }
 
@@ -120,54 +104,33 @@ namespace Sloth.Core
         /// </summary>
         /// <param name="system">The system to remove.</param>
         /// <returns>True if the system was removed, false otherwise.</returns>
-        public bool RemoveSystem(System system)
+        public bool RemoveSystem(EcsSystem system)
         {
             return _systems.Remove(system);
         }
 
+        /// <summary>
+        /// Initializes all systems in the world.
+        /// </summary>
         public void Initialize()
         {
-            foreach (var sys in _systems)
+            foreach (var system in _systems)
             {
-                sys.Initialize(this);
+                system.Initialize(this);
             }
         }
 
         /// <summary>
         /// Updates all systems in the world.
         /// </summary>
-        /// <param name="gameTime">The current game time.</param>
-        public void Update(GameTime gameTime)
+        /// <param name="deltaTime">Time elapsed since last update in seconds.</param>
+        public void Update(float deltaTime)
         {
-            foreach (System system in _systems)
+            foreach (EcsSystem system in _systems)
             {
                 if (system.Enabled)
                 {
-                    system.Update(gameTime);
-                }
-            }
-
-        }
-
-        /// <summary>
-        /// Draws all renderable systems in the world.
-        /// </summary>
-        /// <param name="gameTime">The current game time.</param>
-        public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
-        {
-            // Get camera component for view matrix if it exists
-            CameraComponent camera = null;
-            if (GameHelpers.TryGetSingleCameraEntity(this, out var c))
-            {
-                camera = c.GetComponent<CameraComponent>();
-            }
-            Matrix viewMatrix = camera?.GetViewMatrix() ?? Matrix.Identity;
-
-            foreach (var renderSystem in _renderSystems)
-            {
-                if (renderSystem.Enabled)
-                {
-                    renderSystem.Draw(gameTime, spriteBatch, viewMatrix);
+                    system.Update(deltaTime);
                 }
             }
         }
@@ -180,13 +143,13 @@ namespace Sloth.Core
         public IEnumerable<Entity> GetEntitiesWithComponent<T>() where T : Component
         {
             Type componentType = typeof(T);
-            
+
             if (_componentEntityMap.TryGetValue(componentType, out List<Entity> entities))
             {
                 // Return only active entities
                 return entities.Where(e => e.IsActive);
             }
-            
+
             return Enumerable.Empty<Entity>();
         }
 
@@ -196,11 +159,10 @@ namespace Sloth.Core
         /// <typeparam name="T1">The first component type.</typeparam>
         /// <typeparam name="T2">The second component type.</typeparam>
         /// <returns>An enumerable of entities with the specified components.</returns>
-        public IEnumerable<Entity> GetEntitiesWithComponents<T1, T2>() 
-            where T1 : Component 
+        public IEnumerable<Entity> GetEntitiesWithComponents<T1, T2>()
+            where T1 : Component
             where T2 : Component
         {
-            // Get entities with the first component type, then filter for those with the second type
             return GetEntitiesWithComponent<T1>().Where(e => e.HasComponent<T2>());
         }
 
@@ -211,12 +173,11 @@ namespace Sloth.Core
         /// <typeparam name="T2">The second component type.</typeparam>
         /// <typeparam name="T3">The third component type.</typeparam>
         /// <returns>An enumerable of entities with the specified components.</returns>
-        public IEnumerable<Entity> GetEntitiesWithComponents<T1, T2, T3>() 
-            where T1 : Component 
-            where T2 : Component 
+        public IEnumerable<Entity> GetEntitiesWithComponents<T1, T2, T3>()
+            where T1 : Component
+            where T2 : Component
             where T3 : Component
         {
-            // Get entities with the first two component types, then filter for those with the third type
             return GetEntitiesWithComponents<T1, T2>().Where(e => e.HasComponent<T3>());
         }
 
@@ -242,8 +203,18 @@ namespace Sloth.Core
             {
                 return typedData;
             }
-            
+
             return default;
+        }
+
+        /// <summary>
+        /// Gets a system of the specified type.
+        /// </summary>
+        /// <typeparam name="T">The type of system to get.</typeparam>
+        /// <returns>The system, or null if not found.</returns>
+        public T GetSystem<T>() where T : EcsSystem
+        {
+            return _systems.OfType<T>().FirstOrDefault();
         }
 
         /// <summary>
@@ -281,12 +252,12 @@ namespace Sloth.Core
                 entities = new List<Entity>();
                 _componentEntityMap[componentType] = entities;
             }
-            
+
             if (!entities.Contains(entity))
             {
                 entities.Add(entity);
             }
-            
+
             // Also register for all base types and interfaces
             foreach (Type baseType in componentType.GetInterfaces().Concat(GetBaseTypes(componentType)))
             {
@@ -294,13 +265,13 @@ namespace Sloth.Core
                 {
                     continue;
                 }
-                
+
                 if (!_componentEntityMap.TryGetValue(baseType, out List<Entity> baseEntities))
                 {
                     baseEntities = new List<Entity>();
                     _componentEntityMap[baseType] = baseEntities;
                 }
-                
+
                 if (!baseEntities.Contains(entity))
                 {
                     baseEntities.Add(entity);
@@ -319,13 +290,13 @@ namespace Sloth.Core
             if (_componentEntityMap.TryGetValue(componentType, out List<Entity> entities))
             {
                 entities.Remove(entity);
-                
+
                 if (entities.Count == 0)
                 {
                     _componentEntityMap.Remove(componentType);
                 }
             }
-            
+
             // Also unregister for all base types and interfaces
             foreach (Type baseType in componentType.GetInterfaces().Concat(GetBaseTypes(componentType)))
             {
@@ -333,11 +304,11 @@ namespace Sloth.Core
                 {
                     continue;
                 }
-                
+
                 if (_componentEntityMap.TryGetValue(baseType, out List<Entity> baseEntities))
                 {
                     baseEntities.Remove(entity);
-                    
+
                     if (baseEntities.Count == 0)
                     {
                         _componentEntityMap.Remove(baseType);
@@ -358,36 +329,6 @@ namespace Sloth.Core
             {
                 yield return baseType;
                 baseType = baseType.BaseType;
-            }
-        }
-
-        /// <summary>
-        /// Gets a system of the specified type.
-        /// </summary>
-        /// <typeparam name="T">The type of system to get.</typeparam>
-        /// <returns>The system, or null if not found.</returns>
-        public T GetSystem<T>() where T : System
-        {
-            return _systems.OfType<T>().FirstOrDefault();
-        }
-
-        public void RegisterAllSystems()
-        {
-            var systemTypes = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(a => a.GetTypes())
-                .Where(t => !t.IsAbstract && typeof(Core.ECS.System).IsAssignableFrom(t));
-
-            foreach (var systemType in systemTypes)
-            {
-                try
-                {
-                    var system = (Core.ECS.System)Activator.CreateInstance(systemType);
-                    AddSystem(system);
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Failed to create system {systemType.Name}: {ex.Message}");
-                }
             }
         }
     }

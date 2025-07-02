@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
-using Penguin.Core.ECS;
+using Sloth.Core.Components;
+using Sloth.Core.Entities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

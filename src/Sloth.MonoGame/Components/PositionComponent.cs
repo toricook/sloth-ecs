@@ -1,5 +1,5 @@
 using Microsoft.Xna.Framework;
-using Penguin.Core.ECS;
+using Sloth.Core.Components;
 
 namespace Sloth.MonoGame.Components
 {

@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Xna.Framework;
 
-namespace Sloth.Core
+namespace Sloth.Core.Events
 {
     /// <summary>
     /// Manages events within the ECS framework.

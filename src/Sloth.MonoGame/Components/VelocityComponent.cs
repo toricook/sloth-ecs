@@ -1,7 +1,8 @@
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Xna.Framework;
-using Penguin.Core;
-using Penguin.Core.ECS;
+using Sloth.Core.Components;
+using Sloth.Core.Enums;
+using Sloth.Core.Extensions;
 
 namespace Sloth.MonoGame.Components
 {
